@@ -100,6 +100,34 @@ const discussions = [
 ];
 
 const KnowledgeSharing = () => {
+  const [connectedMap, setConnectedMap] = useState({});
+  const [requestedMap, setRequestedMap] = useState({});
+  const [showRequestModal, setShowRequestModal] = useState(false);
+  const [selectedMentor, setSelectedMentor] = useState(null);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [topic, setTopic] = useState('');
+  const [message, setMessage] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleConnect = (name) => {
+    setConnectedMap(prev => ({ ...prev, [name]: !prev[name] }));
+  };
+
+  const openRequestModal = (mentor) => {
+    setSelectedMentor(mentor);
+    setShowRequestModal(true);
+  };
+
+  const submitRequest = (e) => {
+    e.preventDefault();
+    if (selectedMentor) {
+      setRequestedMap(prev => ({ ...prev, [selectedMentor.name]: true }));
+    }
+    setShowRequestModal(false);
+    setTopic('');
+    setMessage('');
+  };
+
   return (
     <div className="p-8 max-w-[1600px] mx-auto bg-slate-50/50 dark:bg-transparent min-h-screen">
       {/* Header */}
@@ -111,7 +139,10 @@ const KnowledgeSharing = () => {
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-1">Knowledge Sharing</h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm">Share, learn and grow together. Connect with experts and explore knowledge across the organization.</p>
         </div>
-        <button className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg flex items-center gap-2 transition-colors shadow-sm">
+        <button 
+          onClick={() => setShowShareModal(true)}
+          className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg flex items-center gap-2 transition-colors shadow-sm cursor-pointer"
+        >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
@@ -156,6 +187,8 @@ const KnowledgeSharing = () => {
           </div>
           <input 
             type="text" 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search experts, skills, topics..." 
             className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-800 text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
           />
@@ -163,17 +196,21 @@ const KnowledgeSharing = () => {
         <div className="flex flex-wrap gap-3">
           <select className="px-4 py-3 rounded-xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-300 focus:outline-none shadow-sm cursor-pointer min-w-[160px]">
             <option>All Categories</option>
+            <option>Engineering</option>
+            <option>Data Science</option>
+            <option>Design</option>
           </select>
           <select className="px-4 py-3 rounded-xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-300 focus:outline-none shadow-sm cursor-pointer min-w-[140px]">
             <option>All Skills</option>
+            <option>React</option>
+            <option>Java</option>
+            <option>Python</option>
           </select>
           <select className="px-4 py-3 rounded-xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-300 focus:outline-none shadow-sm cursor-pointer min-w-[160px]">
             <option>All Departments</option>
+            <option>Tech</option>
+            <option>Product</option>
           </select>
-          <button className="px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 rounded-xl flex items-center gap-2 font-semibold hover:bg-slate-50 dark:hover:bg-white/5 transition-colors text-sm shadow-sm cursor-pointer">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" /></svg>
-            More Filters
-          </button>
         </div>
       </div>
 
@@ -213,9 +250,12 @@ const KnowledgeSharing = () => {
                         </div>
                      </div>
                      
-                     <button className="w-full py-2 border border-indigo-200 text-indigo-600 bg-white hover:bg-indigo-50 dark:bg-transparent dark:border-indigo-500/40 dark:text-indigo-400 dark:hover:bg-indigo-500/10 rounded-lg text-sm font-bold transition-colors">
-                       Connect
-                     </button>
+                      <button 
+                        onClick={() => handleConnect(expert.name)}
+                        className={`w-full py-2 border text-sm font-bold transition-colors cursor-pointer rounded-lg ${connectedMap[expert.name] ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-indigo-200 text-indigo-600 bg-white hover:bg-indigo-50 dark:bg-transparent dark:border-indigo-500/40 dark:text-indigo-400 dark:hover:bg-indigo-500/10'}`}
+                      >
+                        {connectedMap[expert.name] ? '✓ Connected' : 'Connect'}
+                      </button>
                   </Card>
                 ))}
              </div>
@@ -237,8 +277,11 @@ const KnowledgeSharing = () => {
                       <p className="text-[10px] text-slate-400 truncate mt-0.5">{mentor.desc}</p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <button className="px-3 py-1.5 border border-indigo-200 text-indigo-600 bg-white hover:bg-indigo-50 dark:bg-transparent dark:border-indigo-500/40 dark:text-indigo-400 dark:hover:bg-indigo-500/10 rounded text-[11px] font-bold transition-colors shadow-sm">
-                        Request
+                      <button 
+                        onClick={() => openRequestModal(mentor)}
+                        className={`px-3 py-1.5 border text-[11px] font-bold transition-colors shadow-sm cursor-pointer rounded ${requestedMap[mentor.name] ? 'bg-emerald-600 text-white border-emerald-600' : 'border-indigo-200 text-indigo-600 bg-white hover:bg-indigo-50 dark:bg-transparent dark:border-indigo-500/40 dark:text-indigo-400 dark:hover:bg-indigo-500/10'}`}
+                      >
+                        {requestedMap[mentor.name] ? '✓ Requested' : 'Request'}
                       </button>
                       <button className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" /></svg>
@@ -411,6 +454,99 @@ const KnowledgeSharing = () => {
 
         </div>
       </div>
+
+      {/* Request Mentorship Modal */}
+      {showRequestModal && selectedMentor && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-xl p-6 max-w-md w-full border border-slate-200 dark:border-white/10 shadow-2xl">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Request Session with {selectedMentor.name}</h3>
+            <p className="text-xs text-slate-500 mb-4">Topic area: {selectedMentor.desc}</p>
+            <form onSubmit={submitRequest} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Session Subject / Skill Focus</label>
+                <input 
+                  type="text" 
+                  required
+                  placeholder="e.g. Code review and System Design guidance"
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg text-xs bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border-slate-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Message to Mentor</label>
+                <textarea 
+                  rows={3}
+                  placeholder="Briefly describe what you would like to discuss..."
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg text-xs bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border-slate-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                ></textarea>
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button 
+                  type="button" 
+                  onClick={() => setShowRequestModal(false)}
+                  className="px-4 py-2 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="px-4 py-2 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer"
+                >
+                  Send Request
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Share Knowledge Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-xl p-6 max-w-md w-full border border-slate-200 dark:border-white/10 shadow-2xl">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Share Article / Resource</h3>
+            <p className="text-xs text-slate-500 mb-4">Share technical insights with peers across your organization.</p>
+            <form onSubmit={(e) => { e.preventDefault(); setShowShareModal(false); }} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Resource Title</label>
+                <input 
+                  type="text" 
+                  required
+                  placeholder="e.g. Modern Microservices Architecture"
+                  className="w-full px-3 py-2 border rounded-lg text-xs bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border-slate-200 dark:border-white/10"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Category Tag</label>
+                <select className="w-full px-3 py-2 border rounded-lg text-xs bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border-slate-200 dark:border-white/10">
+                  <option>React / Frontend</option>
+                  <option>Java / Backend</option>
+                  <option>SQL / Database</option>
+                  <option>DevOps / Cloud</option>
+                </select>
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button 
+                  type="button" 
+                  onClick={() => setShowShareModal(false)}
+                  className="px-4 py-2 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="px-4 py-2 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer"
+                >
+                  Publish Resource
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
       
     </div>
   );
