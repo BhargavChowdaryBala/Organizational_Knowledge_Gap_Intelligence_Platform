@@ -64,6 +64,7 @@ export const profileService = {
   updateProfile: (id, profileData) => api.put(`/profiles/${id}`, profileData),
   createProfile: (profileData) => api.post('/profiles', profileData),
   getAllUsers: () => api.get('/users'),
+  getAllProfiles: () => api.get('/profiles'),
 };
 
 export const dashboardService = {
@@ -130,7 +131,8 @@ export const notificationService = {
   getNotifications: () => api.get('/notifications'),
   getLatestNotifications: () => api.get('/notifications/latest'),
   getByType: (type) => api.get(`/notifications/type/${type}`),
-  markAsRead: (id) => api.put(`/notifications/${id}`),
+  markAsRead: (id) => api.put(`/notifications/read/${id}`),
+  createNotification: (data) => api.post('/notifications', data),
 };
 
 export default api;
