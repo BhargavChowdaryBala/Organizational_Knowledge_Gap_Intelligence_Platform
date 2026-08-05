@@ -41,10 +41,10 @@ public class GeminiServiceImpl implements GeminiService {
                 React - Intermediate
 
                 Assessment Score:
-                Java - 65%%
+                Java - 65%
 
                 Learning Progress:
-                Spring Boot Course - 30%%
+                Spring Boot Course - 30%
 
                 Recommend:
                 1. Skill Gap
@@ -93,12 +93,16 @@ public class GeminiServiceImpl implements GeminiService {
                     .asText();
 
             AIRecommendationResponse aiRes = new AIRecommendationResponse();
+            aiRes.setUserId(userId);
+            aiRes.setEmployeeName(employeeName);
             aiRes.setSkillName("Spring Boot & Java");
             aiRes.setRecommendation(recommendation);
             aiRes.setGap(2);
             return List.of(aiRes);
         } catch (Exception e) {
             AIRecommendationResponse fallback = new AIRecommendationResponse();
+            fallback.setUserId(userId);
+            fallback.setEmployeeName(employeeName);
             fallback.setSkillName("Spring Boot & Java Architecture");
             fallback.setRecommendation("Recommend completing advanced Microservices and Cloud Native deployment module.");
             fallback.setGap(2);
