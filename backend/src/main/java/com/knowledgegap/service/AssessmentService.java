@@ -12,10 +12,13 @@ public interface AssessmentService {
 
     List<Assessment> getAllAssessments();
 
+    Assessment getAssessmentById(Integer id);
+
+    List<Assessment> getAssessmentsByCourse(String courseName);
+
     AssessmentResultResponse submitAssessment(
             Integer assessmentId,
             AssessmentSubmissionRequest request);
 
-    List<Assessment> getAssessmentsByCourse(String courseName);
     void deleteAssessment(Integer id);
 }

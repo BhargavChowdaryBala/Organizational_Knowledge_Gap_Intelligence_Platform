@@ -11,15 +11,21 @@ public class AssessmentAnswer {
     private Integer answerId;
 
     @ManyToOne
-    @JoinColumn(name = "question_id")
+    @JoinColumn(name = "question_id", nullable = false)
     private Question question;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @ManyToOne
+    @JoinColumn(name = "assessment_id", nullable = false)
+    private Assessment assessment;
+
+    @Column(nullable = false)
     private String selectedAnswer;
 
+    @Column(nullable = false)
     private Boolean isCorrect;
 
     public AssessmentAnswer() {
@@ -47,6 +53,14 @@ public class AssessmentAnswer {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Assessment getAssessment() {
+        return assessment;
+    }
+
+    public void setAssessment(Assessment assessment) {
+        this.assessment = assessment;
     }
 
     public String getSelectedAnswer() {

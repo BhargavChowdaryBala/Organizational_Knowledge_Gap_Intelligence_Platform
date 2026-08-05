@@ -38,6 +38,12 @@ public class AssessmentServiceImpl implements AssessmentService {
     public Assessment saveAssessment(Assessment assessment) {
         return assessmentRepository.save(assessment);
     }
+    @Override
+public Assessment getAssessmentById(Integer id) {
+    return assessmentRepository.findById(id)
+            .orElseThrow(() ->
+                    new RuntimeException("Assessment not found"));
+}
 
     @Override
     public List<Assessment> getAllAssessments() {
