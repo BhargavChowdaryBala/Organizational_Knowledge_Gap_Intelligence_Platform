@@ -1,6 +1,10 @@
 import React from 'react';
 
 const Hero = () => {
+  const handleGetStarted = () => {
+    window.dispatchEvent(new CustomEvent('open-signup'));
+  };
+
   return (
     <main className="relative z-10 flex flex-col items-center justify-center px-6 pt-32 pb-20 text-center max-w-5xl mx-auto">
       
@@ -19,10 +23,16 @@ const Hero = () => {
       </p>
       
       <div className="animate-fade-in-up animation-delay-300 relative z-10 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto mt-4">
-        <button className="w-full sm:w-auto px-8 py-4 text-base font-medium text-slate-700 dark:text-white bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 rounded-full backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-slate-300 dark:hover:border-white/20 cursor-pointer">
+        <button 
+          onClick={handleGetStarted}
+          className="w-full sm:w-auto px-8 py-4 text-base font-medium text-slate-700 dark:text-white bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 rounded-full backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-slate-300 dark:hover:border-white/20 cursor-pointer"
+        >
           Request Demo
         </button>
-        <button className="relative overflow-hidden w-full sm:w-auto px-8 py-4 text-base font-bold text-white dark:text-black bg-gradient-to-r from-blue-600 to-cyan-500 dark:bg-none dark:bg-[#d9f95d] hover:from-blue-700 hover:to-cyan-600 dark:hover:bg-[#cbf033] rounded-full shadow-[0_0_20px_rgba(6,182,212,0.2)] dark:shadow-[0_0_20px_rgba(217,249,93,0.4)] hover:shadow-[0_0_30px_rgba(6,182,212,0.4)] dark:hover:shadow-[0_0_30px_rgba(217,249,93,0.4)] transition-all duration-300 hover:scale-105 cursor-pointer group">
+        <button 
+          onClick={handleGetStarted}
+          className="relative overflow-hidden w-full sm:w-auto px-8 py-4 text-base font-bold text-white dark:text-black bg-gradient-to-r from-blue-600 to-cyan-500 dark:bg-none dark:bg-[#d9f95d] hover:from-blue-700 hover:to-cyan-600 dark:hover:bg-[#cbf033] rounded-full shadow-[0_0_20px_rgba(6,182,212,0.2)] dark:shadow-[0_0_20px_rgba(217,249,93,0.4)] hover:shadow-[0_0_30px_rgba(6,182,212,0.4)] dark:hover:shadow-[0_0_30px_rgba(217,249,93,0.4)] transition-all duration-300 hover:scale-105 cursor-pointer group"
+        >
           <span className="relative z-10">Get Started Free</span>
           {/* Button Shine Effect */}
           <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>

@@ -10,7 +10,7 @@ const Footer = () => {
             <div className="flex items-center gap-3 mb-6">
               <img
                 src="/logo.png"
-                alt="OKGIP Logo"
+                alt="Knowledge Gap Analyzer Logo"
                 className="h-8 w-auto object-contain mix-blend-multiply dark:mix-blend-normal"
               />
               <span className="font-semibold text-xl tracking-tight text-slate-900 dark:text-white transition-colors duration-300">
@@ -56,7 +56,7 @@ const Footer = () => {
 
         <div className="border-t border-slate-200 dark:border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 transition-colors duration-300">
           <p className="text-slate-500 text-sm">
-            &copy; {new Date().getFullYear()} OKGIP Inc. All rights reserved.
+            &copy; {new Date().getFullYear()} Knowledge Gap Analyzer Inc. All rights reserved.
           </p>
           <div className="flex items-center gap-6 text-sm text-slate-500">
             <a href="#" className="hover:text-slate-900 dark:hover:text-white transition-colors">Privacy Policy</a>

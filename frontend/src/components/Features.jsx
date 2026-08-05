@@ -59,9 +59,9 @@ const Features = () => {
   ];
 
   return (
-    <section className="relative z-10 w-full py-24 border-b border-slate-200 dark:border-white/5 transition-colors duration-300">
+    <section id="modules" className="relative z-10 w-full py-24 border-b border-slate-200 dark:border-white/5 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6">
-        
+
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-4 transition-colors duration-300">
             Everything you need to close the gap
@@ -73,8 +73,8 @@ const Features = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature, i) => (
-            <div 
-              key={i} 
+            <div
+              key={i}
               className="relative group p-8 rounded-2xl bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-black hover:border-cyan-500 dark:hover:border-[#d9f95d]/50 shadow-sm dark:shadow-none hover:shadow-[0_0_30px_rgba(34,211,238,0.15)] dark:hover:shadow-[0_0_30px_rgba(217,249,93,0.15)] transition-all duration-500 hover:-translate-y-2 cursor-pointer overflow-hidden"
             >
               {/* Subtle top highlight gradient on hover */}

@@ -3,6 +3,8 @@ import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 import Workflow from '../components/Workflow';
 import Features from '../components/Features';
+import Organization from '../components/Organization';
+import Impact from '../components/Impact';
 import Footer from '../components/Footer';
 
 import VideoBackground from '../components/VideoBackground';
@@ -22,6 +24,8 @@ const Home = () => {
           <Hero />
           <Workflow />
           <Features />
+          <Organization />
+          <Impact />
         </div>
         
         <Footer />
