@@ -87,10 +87,50 @@ export const gapAnalysisService = {
 
 export const aiRecommendationService = {
   getAIRecommendations: (userId) => api.get(`/ai/recommendation/${userId}`),
+  getRecommendations: (userId) => api.get(`/ai/recommendation/${userId}`),
+  getAllRecommendations: (userId) => api.get(`/recommendations/${userId}`).catch(() => api.get(`/ai/recommendation/${userId}`)),
 };
 
 export const learningPathService = {
   getLearningPath: (userId) => api.get(`/learning-path/${userId}`),
+  generateLearningPath: (userId) => api.post(`/learning-path/generate/${userId}`).catch(() => api.get(`/learning-path/${userId}`)),
+  updateStepStatus: (stepId, status) => api.put(`/learning-path/step/${stepId}`, { status }),
+};
+
+export const courseService = {
+  getCourses: () => api.get('/courses'),
+  getTrainingCourses: () => api.get('/training-courses'),
+};
+
+export const knowledgeSharingService = {
+  getAll: () => api.get('/knowledge-sharing'),
+  getByMentor: (mentorId) => api.get(`/knowledge-sharing/mentor/${mentorId}`),
+  getByMentee: (menteeId) => api.get(`/knowledge-sharing/mentee/${menteeId}`),
+  createRequest: (requestData) => api.post('/knowledge-sharing', requestData),
+  updateStatus: (id, statusData) => api.put(`/knowledge-sharing/${id}`, statusData),
+  getArticles: () => api.get('/articles'),
+  createArticle: (articleData) => api.post('/articles', articleData),
+};
+
+export const assessmentService = {
+  getAssessments: () => api.get('/assessments'),
+  getQuestions: (assessmentId) => api.get(`/questions/assessment/${assessmentId}`),
+  getAllQuestions: () => api.get('/questions'),
+  submitAnswer: (answerData) => api.post('/assessment-answers', answerData),
+  getAnswersByUser: (userId) => api.get(`/assessment-answers/user`),
+  getLearningProgress: () => api.get('/learning-progress'),
+};
+
+export const reportService = {
+  getDashboardReport: () => api.get('/reports/dashboard'),
+  getEmployeesReport: () => api.get('/reports/employees'),
+};
+
+export const notificationService = {
+  getNotifications: () => api.get('/notifications'),
+  getLatestNotifications: () => api.get('/notifications/latest'),
+  getByType: (type) => api.get(`/notifications/type/${type}`),
+  markAsRead: (id) => api.put(`/notifications/${id}`),
 };
 
 export default api;

@@ -8,7 +8,11 @@ public class DashboardSummaryResponse {
     private Long totalCompetencies;
     private Long totalEmployeeSkills;
     private Long totalTrainingCourses;
-
+    private Long totalAssessments;
+private Long totalNotifications;
+private Long completedTrainings;
+private Long inProgressTrainings;
+private Long pendingTrainings;
     public DashboardSummaryResponse() {
     }
 
@@ -59,4 +63,43 @@ public class DashboardSummaryResponse {
     public void setTotalTrainingCourses(Long totalTrainingCourses) {
         this.totalTrainingCourses = totalTrainingCourses;
     }
+    public Long getTotalAssessments() {
+    return totalAssessments;
+}
+
+public void setTotalAssessments(Long totalAssessments) {
+    this.totalAssessments = totalAssessments;
+}
+
+public Long getTotalNotifications() {
+    return totalNotifications;
+}
+
+public void setTotalNotifications(Long totalNotifications) {
+    this.totalNotifications = totalNotifications;
+}
+
+public Long getCompletedTrainings() {
+    return completedTrainings;
+}
+
+public void setCompletedTrainings(Long completedTrainings) {
+    this.completedTrainings = completedTrainings;
+}
+
+public Long getInProgressTrainings() {
+    return inProgressTrainings;
+}
+
+public void setInProgressTrainings(Long inProgressTrainings) {
+    this.inProgressTrainings = inProgressTrainings;
+}
+
+public Long getPendingTrainings() {
+    return pendingTrainings;
+}
+
+public void setPendingTrainings(Long pendingTrainings) {
+    this.pendingTrainings = pendingTrainings;
+}
 }

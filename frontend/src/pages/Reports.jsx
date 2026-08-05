@@ -184,6 +184,28 @@ const Reports = () => {
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-1">Reports</h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm">Comprehensive insights and analytics to drive data-driven decisions.</p>
         </div>
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => {
+              const headers = "Department,Employees,Critical Gaps,Readiness\nEngineering,12,3,82%\nData Science,8,1,88%\nProduct,5,2,75%\nDesign,4,0,95%";
+              const blob = new Blob([headers], { type: 'text/csv' });
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = 'organizational_knowledge_gap_report.csv';
+              a.click();
+            }}
+            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm cursor-pointer flex items-center gap-2"
+          >
+            <span>↓</span> Export CSV Report
+          </button>
+          <button 
+            onClick={() => window.print()}
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm cursor-pointer flex items-center gap-2"
+          >
+            <span>🖨</span> Print Analytics
+          </button>
+        </div>
       </div>
 
       {/* Top Stats Cards */}

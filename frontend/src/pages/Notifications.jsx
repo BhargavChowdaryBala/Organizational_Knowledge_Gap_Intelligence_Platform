@@ -131,6 +131,27 @@ const preferences = [
 
 
 const Notifications = () => {
+  const [items, setItems] = useState(notificationsList);
+  const [activeTab, setActiveTab] = useState('All');
+
+  const markAllRead = () => {
+    setItems(prev => prev.map(n => ({ ...n, unread: false })));
+  };
+
+  const markRead = (idx) => {
+    setItems(prev => prev.map((n, i) => i === idx ? { ...n, unread: false } : n));
+  };
+
+  const filteredItems = items.filter(n => {
+    if (activeTab === 'Unread') return n.unread;
+    if (activeTab === 'Mentions') return n.type === 'mention';
+    if (activeTab === 'System') return n.type === 'system';
+    if (activeTab === 'Learning') return n.type === 'course' || n.type === 'assessment';
+    return true;
+  });
+
+  const unreadCount = items.filter(n => n.unread).length;
+
   return (
     <div className="p-8 max-w-[1600px] mx-auto bg-slate-50/50 dark:bg-transparent min-h-screen">
       {/* Header */}
@@ -150,28 +171,46 @@ const Notifications = () => {
           {/* Tabs and Action Bar */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 dark:border-white/10 pb-4">
             <div className="flex gap-6 overflow-x-auto w-full sm:w-auto hide-scrollbar">
-              <button className="flex items-center gap-2 text-sm font-bold text-indigo-600 dark:text-[#d9f95d] border-b-2 border-indigo-600 dark:border-[#d9f95d] pb-4 -mb-4 whitespace-nowrap">
+              <button 
+                onClick={() => setActiveTab('All')}
+                className={`flex items-center gap-2 text-sm font-bold pb-4 -mb-4 whitespace-nowrap border-b-2 cursor-pointer ${activeTab === 'All' ? 'text-indigo-600 dark:text-[#d9f95d] border-indigo-600 dark:border-[#d9f95d]' : 'text-slate-500 border-transparent'}`}
+              >
                 All Notifications 
-                <span className="bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400 text-[10px] px-1.5 py-0.5 rounded-full font-bold">6</span>
+                <span className="bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400 text-[10px] px-1.5 py-0.5 rounded-full font-bold">{items.length}</span>
               </button>
-              <button className="flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 pb-4 -mb-4 whitespace-nowrap transition-colors">
+              <button 
+                onClick={() => setActiveTab('Unread')}
+                className={`flex items-center gap-2 text-sm font-bold pb-4 -mb-4 whitespace-nowrap border-b-2 cursor-pointer ${activeTab === 'Unread' ? 'text-indigo-600 dark:text-[#d9f95d] border-indigo-600 dark:border-[#d9f95d]' : 'text-slate-500 border-transparent'}`}
+              >
                 Unread
-                <span className="bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 text-[10px] px-1.5 py-0.5 rounded-full font-bold">6</span>
+                <span className="bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 text-[10px] px-1.5 py-0.5 rounded-full font-bold">{unreadCount}</span>
               </button>
-              <button className="flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 pb-4 -mb-4 whitespace-nowrap transition-colors">
+              <button 
+                onClick={() => setActiveTab('Mentions')}
+                className={`flex items-center gap-2 text-sm font-bold pb-4 -mb-4 whitespace-nowrap border-b-2 cursor-pointer ${activeTab === 'Mentions' ? 'text-indigo-600 dark:text-[#d9f95d] border-indigo-600 dark:border-[#d9f95d]' : 'text-slate-500 border-transparent'}`}
+              >
                 Mentions
                 <span className="bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 text-[10px] px-1.5 py-0.5 rounded-full font-bold">1</span>
               </button>
-              <button className="flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 pb-4 -mb-4 whitespace-nowrap transition-colors hidden md:flex">
+              <button 
+                onClick={() => setActiveTab('System')}
+                className={`flex items-center gap-2 text-sm font-bold pb-4 -mb-4 whitespace-nowrap border-b-2 cursor-pointer ${activeTab === 'System' ? 'text-indigo-600 dark:text-[#d9f95d] border-indigo-600 dark:border-[#d9f95d]' : 'text-slate-500 border-transparent'}`}
+              >
                 System
                 <span className="bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 text-[10px] px-1.5 py-0.5 rounded-full font-bold">2</span>
               </button>
-              <button className="flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 pb-4 -mb-4 whitespace-nowrap transition-colors hidden lg:flex">
+              <button 
+                onClick={() => setActiveTab('Learning')}
+                className={`flex items-center gap-2 text-sm font-bold pb-4 -mb-4 whitespace-nowrap border-b-2 cursor-pointer ${activeTab === 'Learning' ? 'text-indigo-600 dark:text-[#d9f95d] border-indigo-600 dark:border-[#d9f95d]' : 'text-slate-500 border-transparent'}`}
+              >
                 Learning
                 <span className="bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 text-[10px] px-1.5 py-0.5 rounded-full font-bold">3</span>
               </button>
             </div>
-            <button className="px-3 py-1.5 bg-white dark:bg-[#1a202c] border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5 text-indigo-600 dark:text-[#d9f95d] text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors shadow-sm whitespace-nowrap shrink-0">
+            <button 
+              onClick={markAllRead}
+              className="px-3 py-1.5 bg-white dark:bg-[#1a202c] border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5 text-indigo-600 dark:text-[#d9f95d] text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors shadow-sm whitespace-nowrap shrink-0 cursor-pointer"
+            >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
               Mark all as read
             </button>
@@ -179,8 +218,8 @@ const Notifications = () => {
 
           {/* Notifications List */}
           <div className="flex flex-col gap-3">
-            {notificationsList.map((notif, idx) => (
-              <Card key={idx} className="flex items-start gap-4 p-5 hover:border-indigo-200 dark:hover:border-indigo-500/30 transition-colors group relative overflow-hidden">
+            {filteredItems.map((notif, idx) => (
+              <Card key={idx} onClick={() => markRead(idx)} className="flex items-start gap-4 p-5 hover:border-indigo-200 dark:hover:border-indigo-500/30 transition-colors group relative overflow-hidden cursor-pointer">
                 {notif.unread && (
                   <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
                 )}
@@ -191,8 +230,18 @@ const Notifications = () => {
                   <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-1 truncate">{notif.title}</h4>
                   <p className="text-xs text-slate-500 mb-2 truncate">{notif.desc}</p>
                   {notif.actionText && (
-                    <button className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
-                      {notif.actionText}
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (notif.type === 'assessment') window.location.href = '/dashboard/assessments';
+                        else if (notif.type === 'course') window.location.href = '/dashboard/recommendations';
+                        else if (notif.type === 'mention' || notif.type === 'resource') window.location.href = '/dashboard/sharing';
+                        else if (notif.type === 'goal') window.location.href = '/dashboard/learning';
+                        else window.location.href = '/dashboard/notifications';
+                      }}
+                      className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
+                    >
+                      {notif.actionText} →
                     </button>
                   )}
                 </div>
@@ -204,11 +253,17 @@ const Notifications = () => {
                     )}
                   </div>
                   {notif.buttonAction ? (
-                    <button className="px-4 py-1.5 border border-indigo-200 text-indigo-600 bg-white hover:bg-indigo-50 dark:bg-transparent dark:border-indigo-500/40 dark:text-indigo-400 dark:hover:bg-indigo-500/10 rounded-lg text-xs font-bold transition-colors shadow-sm mt-auto">
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.location.href = '/dashboard/sharing';
+                      }}
+                      className="px-4 py-1.5 border border-indigo-200 text-indigo-600 bg-white hover:bg-indigo-50 dark:bg-transparent dark:border-indigo-500/40 dark:text-indigo-400 dark:hover:bg-indigo-500/10 rounded-lg text-xs font-bold transition-colors shadow-sm mt-auto cursor-pointer"
+                    >
                       {notif.buttonAction}
                     </button>
                   ) : (
-                    <button className="text-slate-400 hover:text-indigo-600 dark:hover:text-[#d9f95d] transition-colors p-1 mt-auto opacity-0 group-hover:opacity-100">
+                    <button className="text-slate-400 hover:text-indigo-600 dark:hover:text-[#d9f95d] transition-colors p-1 mt-auto opacity-0 group-hover:opacity-100 cursor-pointer">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" /></svg>
                     </button>
                   )}
