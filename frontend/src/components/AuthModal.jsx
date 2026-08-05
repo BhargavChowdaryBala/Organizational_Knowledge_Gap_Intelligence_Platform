@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authService, roleService, departmentService } from '../services/api';
+import { authService, roleService, departmentService, profileService } from '../services/api';
 
 const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
   const [view, setView] = useState(initialView);
   const [showPassword, setShowPassword] = useState(false);
   const [roles, setRoles] = useState([]);
   const [departments, setDepartments] = useState([]);
+  const [isRoleOpen, setIsRoleOpen] = useState(false);
+  const [isDeptOpen, setIsDeptOpen] = useState(false);
   
   // Form State
   const [formData, setFormData] = useState({
@@ -33,6 +35,8 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
       setView(initialView);
       setShowPassword(false);
       setError('');
+      setIsRoleOpen(false);
+      setIsDeptOpen(false);
       setFormData({
         firstName: '',
         lastName: '',
@@ -80,6 +84,19 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
     setLoading(true);
     setError('');
 
+    if (view === 'signup') {
+      if (!formData.roleName) {
+        setError('Please select a role');
+        setLoading(false);
+        return;
+      }
+      if (!formData.departmentName) {
+        setError('Please select a department');
+        setLoading(false);
+        return;
+      }
+    }
+
     try {
       let response;
       if (view === 'signin') {
@@ -103,7 +120,30 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('userName', response.data.name || '');
         localStorage.setItem('userEmail', response.data.email || '');
-        localStorage.setItem('userId', response.data.userId || '');
+        const userId = response.data.userId;
+        localStorage.setItem('userId', userId || '');
+
+        if (view === 'signup') {
+          const selectedRole = formData.roleName === 'Other' ? formData.customRoleName : formData.roleName;
+          localStorage.setItem('userRole', (selectedRole || 'EMPLOYEE').toUpperCase());
+        } else {
+          // If login, fetch profile to retrieve the role
+          try {
+            const profileRes = await profileService.getProfile(userId);
+            if (profileRes && profileRes.data) {
+              const p = profileRes.data;
+              const finalProfile = p.user ? p : (p.data || p);
+              const rName = finalProfile.user?.role?.roleName || 'EMPLOYEE';
+              localStorage.setItem('userRole', rName.toUpperCase());
+            } else {
+              localStorage.setItem('userRole', 'EMPLOYEE');
+            }
+          } catch (profileErr) {
+            console.warn('Fallback: defaulting userRole to EMPLOYEE', profileErr);
+            localStorage.setItem('userRole', 'EMPLOYEE');
+          }
+        }
+
         onClose();
         navigate('/dashboard/employee');
       } else {
@@ -265,37 +305,104 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
 
             {view === 'signup' && (
               <div className="grid grid-cols-2 gap-4">
-                <div>
+                {/* Custom Role Dropdown */}
+                <div className="relative">
                   <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">Role</label>
-                  <select
-                    name="roleName"
-                    value={formData.roleName}
-                    onChange={handleChange}
-                    required={view === 'signup'}
-                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#27272a] border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 dark:focus:ring-[#d9f95d]/50 focus:border-cyan-500 dark:focus:border-[#d9f95d] transition-all"
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsRoleOpen(!isRoleOpen);
+                      setIsDeptOpen(false);
+                    }}
+                    className="w-full flex items-center justify-between px-3 py-2.5 bg-slate-50 dark:bg-[#27272a] border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 dark:focus:ring-[#d9f95d]/50 focus:border-cyan-500 dark:focus:border-[#d9f95d] transition-all text-left"
                   >
-                    <option value="">Select Role</option>
-                    {roles.map((r, i) => (
-                      <option key={i} value={r.roleName}>{r.roleName}</option>
-                    ))}
-                    <option value="Other">Other (Type Custom)</option>
-                  </select>
+                    <span className="truncate">{formData.roleName || "Select Role"}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={`w-4 h-4 text-slate-400 dark:text-zinc-500 transition-transform duration-200 ${isRoleOpen ? 'rotate-180' : ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                  </button>
+                  {isRoleOpen && (
+                    <div className="absolute z-50 w-full mt-1.5 bg-white dark:bg-[#1f2026] border border-slate-200 dark:border-zinc-700 rounded-xl shadow-xl max-h-48 overflow-y-auto">
+                      <div 
+                        className="px-3 py-2 text-sm text-slate-400 dark:text-zinc-500 hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                        onClick={() => {
+                          setFormData({ ...formData, roleName: "" });
+                          setIsRoleOpen(false);
+                        }}
+                      >
+                        Select Role
+                      </div>
+                      {roles.map((r, i) => (
+                        <div 
+                          key={i}
+                          className="px-3 py-2 text-sm hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer text-slate-900 dark:text-white"
+                          onClick={() => {
+                            setFormData({ ...formData, roleName: r.roleName });
+                            setIsRoleOpen(false);
+                          }}
+                        >
+                          {r.roleName}
+                        </div>
+                      ))}
+                      <div 
+                        className="px-3 py-2 text-sm hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer text-indigo-600 dark:text-[#d9f95d] font-semibold"
+                        onClick={() => {
+                          setFormData({ ...formData, roleName: "Other" });
+                          setIsRoleOpen(false);
+                        }}
+                      >
+                        Other (Type Custom)
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div>
+
+                {/* Custom Department Dropdown */}
+                <div className="relative">
                   <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">Department</label>
-                  <select
-                    name="departmentName"
-                    value={formData.departmentName}
-                    onChange={handleChange}
-                    required={view === 'signup'}
-                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#27272a] border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 dark:focus:ring-[#d9f95d]/50 focus:border-cyan-500 dark:focus:border-[#d9f95d] transition-all"
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsDeptOpen(!isDeptOpen);
+                      setIsRoleOpen(false);
+                    }}
+                    className="w-full flex items-center justify-between px-3 py-2.5 bg-slate-50 dark:bg-[#27272a] border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 dark:focus:ring-[#d9f95d]/50 focus:border-cyan-500 dark:focus:border-[#d9f95d] transition-all text-left"
                   >
-                    <option value="">Select Department</option>
-                    {departments.map((d, i) => (
-                      <option key={i} value={d.departmentName}>{d.departmentName}</option>
-                    ))}
-                    <option value="Other">Other (Type Custom)</option>
-                  </select>
+                    <span className="truncate">{formData.departmentName || "Select Department"}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={`w-4 h-4 text-slate-400 dark:text-zinc-500 transition-transform duration-200 ${isDeptOpen ? 'rotate-180' : ''}`}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                  </button>
+                  {isDeptOpen && (
+                    <div className="absolute z-50 w-full mt-1.5 bg-white dark:bg-[#1f2026] border border-slate-200 dark:border-zinc-700 rounded-xl shadow-xl max-h-48 overflow-y-auto">
+                      <div 
+                        className="px-3 py-2 text-sm text-slate-400 dark:text-zinc-500 hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                        onClick={() => {
+                          setFormData({ ...formData, departmentName: "" });
+                          setIsDeptOpen(false);
+                        }}
+                      >
+                        Select Department
+                      </div>
+                      {departments.map((d, i) => (
+                        <div 
+                          key={i}
+                          className="px-3 py-2 text-sm hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer text-slate-900 dark:text-white"
+                          onClick={() => {
+                            setFormData({ ...formData, departmentName: d.departmentName });
+                            setIsDeptOpen(false);
+                          }}
+                        >
+                          {d.departmentName}
+                        </div>
+                      ))}
+                      <div 
+                        className="px-3 py-2 text-sm hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer text-indigo-600 dark:text-[#d9f95d] font-semibold"
+                        onClick={() => {
+                          setFormData({ ...formData, departmentName: "Other" });
+                          setIsDeptOpen(false);
+                        }}
+                      >
+                        Other (Type Custom)
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

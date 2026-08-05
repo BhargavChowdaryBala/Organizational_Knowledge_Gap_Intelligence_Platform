@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { knowledgeSharingService, profileService, notificationService } from '../services/api';
 
 const Card = ({ children, className = '', noPadding = false }) => (
   <div className={`bg-white dark:bg-[#1a202c] shadow-sm rounded-xl border border-slate-200 dark:border-white/5 transition-colors duration-300 ${noPadding ? '' : 'p-6'} ${className}`}>
@@ -108,9 +109,36 @@ const KnowledgeSharing = () => {
   const [topic, setTopic] = useState('');
   const [message, setMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [shareTitle, setShareTitle] = useState('');
+  const [shareCategory, setShareCategory] = useState('React / Frontend');
+  const [sessionsList, setSessionsList] = useState(sessions);
+  const [resourcesList, setResourcesList] = useState(resources);
+  const [selectedCategory, setSelectedCategory] = useState('All Categories');
+  const [selectedSkill, setSelectedSkill] = useState('All Skills');
+  const [selectedDept, setSelectedDept] = useState('All Departments');
+  const [expertsList, setExpertsList] = useState(experts);
+  const [mentorsList, setMentorsList] = useState(mentors);
 
-  const handleConnect = (name) => {
-    setConnectedMap(prev => ({ ...prev, [name]: !prev[name] }));
+  const handleConnect = async (expert) => {
+    const name = expert.name || expert;
+    const isConnecting = !connectedMap[name];
+    setConnectedMap(prev => ({ ...prev, [name]: isConnecting }));
+
+    if (isConnecting) {
+      try {
+        const targetUserId = expert.userId || 1;
+        const currentUserName = localStorage.getItem('userName') || 'Bhargav';
+        await notificationService.createNotification({
+          user: { userId: targetUserId },
+          title: 'New Connection Request',
+          message: `${currentUserName} requested to connect with you on Knowledge Sharing!`,
+          type: 'connection',
+          isRead: false
+        });
+      } catch (err) {
+        console.warn('Failed to send connection notification to database:', err);
+      }
+    }
   };
 
   const openRequestModal = (mentor) => {
@@ -118,15 +146,263 @@ const KnowledgeSharing = () => {
     setShowRequestModal(true);
   };
 
-  const submitRequest = (e) => {
+  const mapBackendSession = (s) => {
+    const dateObj = new Date(s.sessionDate);
+    const day = isNaN(dateObj.getDate()) ? '25' : String(dateObj.getDate());
+    const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+    const month = isNaN(dateObj.getMonth()) ? 'MAY' : monthNames[dateObj.getMonth()];
+    return {
+      id: s.sharingId,
+      day,
+      month,
+      title: s.sessionTitle,
+      author: `Mentor #${s.mentorId}`,
+      time: s.sessionTime,
+      type: s.meetingLink ? 'Online' : 'Offline'
+    };
+  };
+
+  const mapBackendArticle = (a) => {
+    let tagColor = 'bg-blue-50 text-blue-600 dark:bg-blue-500/10';
+    let iconBg = 'bg-rose-100 text-rose-500 dark:bg-rose-500/20';
+    if (a.category && a.category.toLowerCase().includes('java')) {
+      tagColor = 'bg-amber-50 text-amber-600 dark:bg-amber-500/10';
+      iconBg = 'bg-blue-100 text-blue-500 dark:bg-blue-500/20';
+    } else if (a.category && a.category.toLowerCase().includes('sql')) {
+      tagColor = 'bg-cyan-50 text-cyan-600 dark:bg-cyan-500/10';
+      iconBg = 'bg-blue-100 text-blue-500 dark:bg-blue-500/20';
+    } else if (a.category && a.category.toLowerCase().includes('devops')) {
+      tagColor = 'bg-orange-50 text-orange-600 dark:bg-orange-500/10';
+      iconBg = 'bg-orange-100 text-orange-500 dark:bg-orange-500/20';
+    }
+    return {
+      id: a.articleId,
+      icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>,
+      iconBg,
+      title: a.title,
+      author: a.author || 'Anonymous',
+      tag: a.category || 'General',
+      tagColor,
+      type: 'PDF',
+      views: Math.floor(Math.random() * 50) + 10,
+      downloads: Math.floor(Math.random() * 10) + 2,
+      time: a.createdDate || 'Just now'
+    };
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [sessionsRes, articlesRes, profilesRes] = await Promise.all([
+          knowledgeSharingService.getAll(),
+          knowledgeSharingService.getArticles(),
+          profileService.getAllProfiles().catch(() => ({ data: [] }))
+        ]);
+        if (sessionsRes && sessionsRes.data && sessionsRes.data.length > 0) {
+          setSessionsList(sessionsRes.data.map(mapBackendSession));
+        }
+        if (articlesRes && articlesRes.data && articlesRes.data.length > 0) {
+          setResourcesList(articlesRes.data.map(mapBackendArticle));
+        }
+        if (profilesRes && profilesRes.data && profilesRes.data.length > 0) {
+          const mappedExperts = profilesRes.data.map((p, i) => {
+            const colors = ['bg-indigo-500', 'bg-emerald-500', 'bg-cyan-500', 'bg-purple-500', 'bg-rose-500', 'bg-amber-500'];
+            const name = p.user ? `${p.user.firstName} ${p.user.lastName}` : 'Anonymous Expert';
+            return {
+              id: p.profileId,
+              name,
+              role: p.designation || 'Software Engineer',
+              rating: 4.5 + (i % 5) * 0.1,
+              count: 50 + (i % 10) * 12,
+              connections: 10 + (i % 5) * 4,
+              skills: [
+                { n: 'React', c: 'bg-blue-50 text-blue-600 dark:bg-blue-500/10' },
+                { n: 'Java', c: 'bg-amber-50 text-amber-600 dark:bg-amber-500/10' },
+                { n: 'AWS', c: 'bg-orange-50 text-orange-600 dark:bg-orange-500/10' }
+              ],
+              avatarColor: colors[i % colors.length]
+            };
+          });
+          setExpertsList(mappedExperts);
+
+          const mappedMentors = profilesRes.data
+            .filter(p => p.experience && p.experience >= 3)
+            .map((p, i) => {
+              const colors = ['bg-rose-500', 'bg-amber-500', 'bg-blue-500', 'bg-teal-500'];
+              const name = p.user ? `${p.user.firstName} ${p.user.lastName}` : 'Anonymous Mentor';
+              return {
+                id: p.profileId,
+                name,
+                role: p.designation || 'Senior Developer',
+                desc: p.bio || 'System Design, Architecture',
+                color: colors[i % colors.length]
+              };
+            });
+          if (mappedMentors.length > 0) {
+            setMentorsList(mappedMentors);
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to load sharing data from backend:', err);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const submitRequest = async (e) => {
     e.preventDefault();
     if (selectedMentor) {
       setRequestedMap(prev => ({ ...prev, [selectedMentor.name]: true }));
+      try {
+        await knowledgeSharingService.createRequest({
+          mentorId: selectedMentor.userId || 1,
+          menteeId: parseInt(localStorage.getItem('userId')) || 2,
+          skillName: selectedMentor.desc,
+          sessionTitle: topic,
+          description: message,
+          sessionDate: new Date().toISOString().split('T')[0],
+          sessionTime: "12:00 PM",
+          meetingLink: "https://zoom.us/j/12345678",
+          status: "Pending"
+        });
+
+        // Send a notification to the mentor in the backend
+        const targetUserId = selectedMentor.userId || 1;
+        const currentUserName = localStorage.getItem('userName') || 'Bhargav';
+        await notificationService.createNotification({
+          user: { userId: targetUserId },
+          title: 'New Mentorship Request',
+          message: `${currentUserName} requested a mentorship session: "${topic}". Message: "${message}"`,
+          type: 'mentorship',
+          isRead: false
+        });
+      } catch (err) {
+        console.error('Failed to create mentorship request in backend:', err);
+      }
     }
     setShowRequestModal(false);
     setTopic('');
     setMessage('');
   };
+
+  const submitShare = async (e) => {
+    e.preventDefault();
+    try {
+      await knowledgeSharingService.createArticle({
+        title: shareTitle,
+        content: `Resource created under category ${shareCategory}`,
+        category: shareCategory,
+        author: 'Bhargav',
+        createdDate: new Date().toISOString().split('T')[0]
+      });
+      const res = await knowledgeSharingService.getArticles();
+      if (res && res.data && res.data.length > 0) {
+        setResourcesList(res.data.map(mapBackendArticle));
+      }
+    } catch (err) {
+      console.error('Failed to publish resource in backend:', err);
+    }
+    setShowShareModal(false);
+    setShareTitle('');
+  };
+
+  const filteredExperts = expertsList.filter(expert => {
+    const query = searchQuery.toLowerCase().trim();
+    if (query) {
+      const matchQuery = (
+        expert.name.toLowerCase().includes(query) ||
+        expert.role.toLowerCase().includes(query) ||
+        expert.skills.some(skill => skill.n.toLowerCase().includes(query))
+      );
+      if (!matchQuery) return false;
+    }
+
+    if (selectedCategory !== 'All Categories') {
+      const categoryLower = selectedCategory.toLowerCase();
+      if (categoryLower === 'engineering') {
+        const isEng = ['tech lead', 'devops', 'developer', 'software engineer', 'backend', 'architect', 'manager'].some(term => expert.role.toLowerCase().includes(term));
+        if (!isEng) return false;
+      } else if (categoryLower === 'data science') {
+        const isDS = ['data', 'ml', 'machine learning'].some(term => expert.role.toLowerCase().includes(term));
+        if (!isDS) return false;
+      } else if (categoryLower === 'design') {
+        const isDesign = ['design', 'ui', 'ux'].some(term => expert.role.toLowerCase().includes(term));
+        if (!isDesign) return false;
+      }
+    }
+
+    if (selectedSkill !== 'All Skills') {
+      const skillLower = selectedSkill.toLowerCase();
+      const hasSkill = expert.skills.some(skill => skill.n.toLowerCase().includes(skillLower));
+      if (!hasSkill) return false;
+    }
+
+    if (selectedDept !== 'All Departments') {
+      const deptLower = selectedDept.toLowerCase();
+      if (deptLower === 'tech') {
+        const isTech = !['designer', 'ui', 'ux'].some(term => expert.role.toLowerCase().includes(term));
+        if (!isTech) return false;
+      } else if (deptLower === 'product') {
+        const isProduct = ['designer', 'ui', 'ux', 'manager'].some(term => expert.role.toLowerCase().includes(term));
+        if (!isProduct) return false;
+      }
+    }
+
+    return true;
+  });
+
+  const filteredResources = resourcesList.filter(res => {
+    const query = searchQuery.toLowerCase().trim();
+    if (query) {
+      const matchQuery = (
+        res.title.toLowerCase().includes(query) ||
+        res.author.toLowerCase().includes(query) ||
+        res.tag.toLowerCase().includes(query)
+      );
+      if (!matchQuery) return false;
+    }
+
+    if (selectedCategory !== 'All Categories') {
+      const categoryLower = selectedCategory.toLowerCase();
+      if (categoryLower === 'engineering') {
+        const isEng = ['react', 'java', 'backend', 'devops', 'cloud', 'aws', 'kubernetes', 'docker'].some(term => res.tag.toLowerCase().includes(term) || res.title.toLowerCase().includes(term));
+        if (!isEng) return false;
+      } else if (categoryLower === 'data science') {
+        const isDS = ['data', 'ml', 'python', 'sql', 'query'].some(term => res.tag.toLowerCase().includes(term) || res.title.toLowerCase().includes(term));
+        if (!isDS) return false;
+      } else if (categoryLower === 'design') {
+        const isDesign = ['design', 'figma', 'ui', 'ux'].some(term => res.tag.toLowerCase().includes(term) || res.title.toLowerCase().includes(term));
+        if (!isDesign) return false;
+      }
+    }
+
+    if (selectedSkill !== 'All Skills') {
+      const skillLower = selectedSkill.toLowerCase();
+      const hasSkill = res.tag.toLowerCase().includes(skillLower) || res.title.toLowerCase().includes(skillLower);
+      if (!hasSkill) return false;
+    }
+
+    return true;
+  });
+
+  const filteredSessions = sessionsList.filter(session => {
+    const query = searchQuery.toLowerCase().trim();
+    if (query) {
+      const matchQuery = (
+        session.title.toLowerCase().includes(query) ||
+        session.author.toLowerCase().includes(query)
+      );
+      if (!matchQuery) return false;
+    }
+
+    if (selectedSkill !== 'All Skills') {
+      const skillLower = selectedSkill.toLowerCase();
+      const hasSkill = session.title.toLowerCase().includes(skillLower);
+      if (!hasSkill) return false;
+    }
+
+    return true;
+  });
 
   return (
     <div className="p-8 max-w-[1600px] mx-auto bg-slate-50/50 dark:bg-transparent min-h-screen">
@@ -194,22 +470,39 @@ const KnowledgeSharing = () => {
           />
         </div>
         <div className="flex flex-wrap gap-3">
-          <select className="px-4 py-3 rounded-xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-300 focus:outline-none shadow-sm cursor-pointer min-w-[160px]">
-            <option>All Categories</option>
-            <option>Engineering</option>
-            <option>Data Science</option>
-            <option>Design</option>
+          <select 
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="px-4 py-3 rounded-xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-300 focus:outline-none shadow-sm cursor-pointer min-w-[160px]"
+          >
+            <option value="All Categories">All Categories</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Data Science">Data Science</option>
+            <option value="Design">Design</option>
           </select>
-          <select className="px-4 py-3 rounded-xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-300 focus:outline-none shadow-sm cursor-pointer min-w-[140px]">
-            <option>All Skills</option>
-            <option>React</option>
-            <option>Java</option>
-            <option>Python</option>
+          <select 
+            value={selectedSkill}
+            onChange={(e) => setSelectedSkill(e.target.value)}
+            className="px-4 py-3 rounded-xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-300 focus:outline-none shadow-sm cursor-pointer min-w-[140px]"
+          >
+            <option value="All Skills">All Skills</option>
+            <option value="React">React</option>
+            <option value="Java">Java</option>
+            <option value="Python">Python</option>
+            <option value="Node.js">Node.js</option>
+            <option value="AWS">AWS</option>
+            <option value="Docker">Docker</option>
+            <option value="Kubernetes">Kubernetes</option>
+            <option value="Figma">Figma</option>
           </select>
-          <select className="px-4 py-3 rounded-xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-300 focus:outline-none shadow-sm cursor-pointer min-w-[160px]">
-            <option>All Departments</option>
-            <option>Tech</option>
-            <option>Product</option>
+          <select 
+            value={selectedDept}
+            onChange={(e) => setSelectedDept(e.target.value)}
+            className="px-4 py-3 rounded-xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-300 focus:outline-none shadow-sm cursor-pointer min-w-[160px]"
+          >
+            <option value="All Departments">All Departments</option>
+            <option value="Tech">Tech</option>
+            <option value="Product">Product</option>
           </select>
         </div>
       </div>
@@ -223,7 +516,7 @@ const KnowledgeSharing = () => {
           <div>
              <SectionTitle title="Find Experts" action={true} actionText="View All Experts" />
              <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-2">
-                {experts.map((expert, idx) => (
+                {filteredExperts.map((expert, idx) => (
                   <Card key={idx} className="min-w-[260px] max-w-[260px] flex-shrink-0 flex flex-col items-center p-5 relative overflow-hidden group">
                      {/* subtle background glow */}
                      <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/10 transition-colors"></div>
@@ -251,7 +544,7 @@ const KnowledgeSharing = () => {
                      </div>
                      
                       <button 
-                        onClick={() => handleConnect(expert.name)}
+                        onClick={() => handleConnect(expert)}
                         className={`w-full py-2 border text-sm font-bold transition-colors cursor-pointer rounded-lg ${connectedMap[expert.name] ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-indigo-200 text-indigo-600 bg-white hover:bg-indigo-50 dark:bg-transparent dark:border-indigo-500/40 dark:text-indigo-400 dark:hover:bg-indigo-500/10'}`}
                       >
                         {connectedMap[expert.name] ? '✓ Connected' : 'Connect'}
@@ -268,7 +561,7 @@ const KnowledgeSharing = () => {
             <div>
               <SectionTitle title="Available Mentors" action={true} actionText="View All Mentors" />
               <Card className="flex flex-col p-2 space-y-1">
-                {mentors.map((mentor, idx) => (
+                {mentorsList.map((mentor, idx) => (
                   <div key={idx} className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors group">
                     <Avatar name={mentor.name} colorClass={mentor.color} />
                     <div className="flex-1 min-w-0">
@@ -322,7 +615,7 @@ const KnowledgeSharing = () => {
              <div className="overflow-x-auto pb-4">
                <table className="w-full text-left border-collapse min-w-[750px]">
                  <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                   {resources.map((res, idx) => (
+                   {filteredResources.map((res, idx) => (
                      <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors group">
                        <td className="pl-6 py-4 w-12">
                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${res.iconBg}`}>
@@ -369,7 +662,7 @@ const KnowledgeSharing = () => {
           <Card>
             <SectionTitle title="Upcoming Knowledge Sessions" action={true} actionText="View Calendar" />
             <div className="space-y-4">
-              {sessions.map((session, i) => (
+              {filteredSessions.map((session, i) => (
                 <div key={i} className="flex items-start gap-4 pb-4 border-b border-slate-100 dark:border-white/5 last:border-0 last:pb-0">
                    <div className="flex flex-col items-center justify-center w-12 h-12 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shrink-0">
                       <span className="text-lg font-black text-slate-900 dark:text-white leading-none">{session.day}</span>
@@ -509,23 +802,29 @@ const KnowledgeSharing = () => {
           <div className="bg-white dark:bg-slate-900 rounded-xl p-6 max-w-md w-full border border-slate-200 dark:border-white/10 shadow-2xl">
             <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Share Article / Resource</h3>
             <p className="text-xs text-slate-500 mb-4">Share technical insights with peers across your organization.</p>
-            <form onSubmit={(e) => { e.preventDefault(); setShowShareModal(false); }} className="space-y-4">
+            <form onSubmit={submitShare} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Resource Title</label>
                 <input 
                   type="text" 
                   required
                   placeholder="e.g. Modern Microservices Architecture"
+                  value={shareTitle}
+                  onChange={(e) => setShareTitle(e.target.value)}
                   className="w-full px-3 py-2 border rounded-lg text-xs bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border-slate-200 dark:border-white/10"
                 />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Category Tag</label>
-                <select className="w-full px-3 py-2 border rounded-lg text-xs bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border-slate-200 dark:border-white/10">
-                  <option>React / Frontend</option>
-                  <option>Java / Backend</option>
-                  <option>SQL / Database</option>
-                  <option>DevOps / Cloud</option>
+                <select 
+                  value={shareCategory}
+                  onChange={(e) => setShareCategory(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg text-xs bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border-slate-200 dark:border-white/10"
+                >
+                  <option value="React / Frontend">React / Frontend</option>
+                  <option value="Java / Backend">Java / Backend</option>
+                  <option value="SQL / Database">SQL / Database</option>
+                  <option value="DevOps / Cloud">DevOps / Cloud</option>
                 </select>
               </div>
               <div className="flex justify-end gap-3 pt-2">
