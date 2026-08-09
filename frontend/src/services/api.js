@@ -39,6 +39,8 @@ api.interceptors.response.use(
 export const authService = {
   login: (credentials) => api.post('/auth/login', credentials),
   register: (details) => api.post('/auth/register', details),
+  otpLogin: (email) => api.post('/auth/otp-login', { email }),
+  resetPassword: (email, newPassword) => api.post('/auth/reset-password', { email, newPassword }),
 };
 
 export const roleService = {

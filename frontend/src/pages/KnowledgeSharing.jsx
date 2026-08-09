@@ -50,56 +50,6 @@ const Avatar = ({ name, colorClass }) => {
   );
 };
 
-const experts = [
-  { name: 'Arjun Patel', role: 'Tech Lead', rating: 4.9, count: 126, connections: 23, skills: [{n:'React',c:'bg-blue-50 text-blue-600 dark:bg-blue-500/10'}, {n:'Node.js',c:'bg-green-50 text-green-600 dark:bg-green-500/10'}, {n:'AWS',c:'bg-orange-50 text-orange-600 dark:bg-orange-500/10'}], avatarColor: 'bg-indigo-500' },
-  { name: 'Priya Sharma', role: 'Senior Data Scientist', rating: 4.8, count: 98, connections: 18, skills: [{n:'Python',c:'bg-blue-50 text-blue-600 dark:bg-blue-500/10'}, {n:'ML',c:'bg-purple-50 text-purple-600 dark:bg-purple-500/10'}, {n:'SQL',c:'bg-cyan-50 text-cyan-600 dark:bg-cyan-500/10'}], avatarColor: 'bg-emerald-500' },
-  { name: 'Rohit Singh', role: 'DevOps Engineer', rating: 4.7, count: 76, connections: 15, skills: [{n:'Docker',c:'bg-blue-50 text-blue-600 dark:bg-blue-500/10'}, {n:'Kubernetes',c:'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10'}, {n:'AWS',c:'bg-orange-50 text-orange-600 dark:bg-orange-500/10'}], avatarColor: 'bg-cyan-500' },
-  { name: 'Ananya Iyer', role: 'UI/UX Designer', rating: 4.9, count: 88, connections: 21, skills: [{n:'Figma',c:'bg-pink-50 text-pink-600 dark:bg-pink-500/10'}, {n:'UI Design',c:'bg-purple-50 text-purple-600 dark:bg-purple-500/10'}, {n:'UX',c:'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10'}], avatarColor: 'bg-purple-500' }
-];
-
-const mentors = [
-  { name: 'Vikram Mehta', role: 'Engineering Manager', desc: 'System Design', color: 'bg-rose-500' },
-  { name: 'Neha Gupta', role: 'Senior Backend Developer', desc: 'Java, Spring Boot', color: 'bg-amber-500' },
-  { name: 'Siddharth Rao', role: 'Cloud Architect', desc: 'AWS, Azure', color: 'bg-blue-500' },
-  { name: 'Meera Nair', role: 'Data Engineering Lead', desc: 'SQL, Python, Big Data', color: 'bg-teal-500' }
-];
-
-const communities = [
-  { title: 'Full Stack Developers', desc: 'Discuss web development, frameworks and tools', members: '1.2K members', icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" /></svg>, iconColor: 'text-blue-500' },
-  { title: 'Data Science Community', desc: 'Share insights on ML, AI and Data Science', members: '982 members', icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zm13.5-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v10.125c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V9.75z" /></svg>, iconColor: 'text-indigo-500' },
-  { title: 'DevOps & Cloud', desc: 'Everything about DevOps, CI/CD and Cloud', members: '756 members', icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z" /></svg>, iconColor: 'text-cyan-500' },
-  { title: 'UI/UX Designers Hub', desc: 'UX trends, best practices and design resources', members: '512 members', icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" /></svg>, iconColor: 'text-pink-500' }
-];
-
-const resources = [
-  { icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>, iconBg: 'bg-rose-100 text-rose-500 dark:bg-rose-500/20', title: 'React Best Practices 2025', author: 'Arjun Patel', tag: 'React', tagColor: 'bg-blue-50 text-blue-600 dark:bg-blue-500/10', type: 'PDF', views: 125, downloads: 24, time: '2h ago' },
-  { icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>, iconBg: 'bg-blue-100 text-blue-500 dark:bg-blue-500/20', title: 'SQL Query Optimization Guide', author: 'Neha Gupta', tag: 'SQL', tagColor: 'bg-cyan-50 text-cyan-600 dark:bg-cyan-500/10', type: 'Document', views: 98, downloads: 18, time: '5h ago' },
-  { icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0119.5 16.5h-2.25m-9 0h9l-4.5 5.25L9 16.5z" /></svg>, iconBg: 'bg-orange-100 text-orange-500 dark:bg-orange-500/20', title: 'AWS Well-Architected Framework', author: 'Rohit Singh', tag: 'AWS', tagColor: 'bg-orange-50 text-orange-600 dark:bg-orange-500/10', type: 'Presentation', views: 156, downloads: 32, time: '1d ago' },
-  { icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" /></svg>, iconBg: 'bg-pink-100 text-pink-500 dark:bg-pink-500/20', title: 'Design System Fundamentals', author: 'Ananya Iyer', tag: 'Design', tagColor: 'bg-pink-50 text-pink-600 dark:bg-pink-500/10', type: 'Figma File', views: 87, downloads: 15, time: '2d ago' },
-];
-
-const sessions = [
-  { day: '22', month: 'MAY', title: 'Building Scalable Microservices', author: 'Arjun Patel', time: '4:00 PM - 5:00 PM', type: 'Online' },
-  { day: '24', month: 'MAY', title: 'Introduction to Generative AI', author: 'Priya Sharma', time: '11:00 AM - 12:00 PM', type: 'Online' },
-  { day: '26', month: 'MAY', title: 'Kubernetes Best Practices', author: 'Rohit Singh', time: '3:00 PM - 4:00 PM', type: 'Online' },
-  { day: '28', month: 'MAY', title: 'Design Systems with Figma', author: 'Ananya Iyer', time: '5:00 PM - 6:00 PM', type: 'Online' },
-];
-
-const contributors = [
-  { rank: 1, name: 'Arjun Patel', role: 'Tech Lead', points: '2,450 pts', avatarColor: 'bg-indigo-500' },
-  { rank: 2, name: 'Priya Sharma', role: 'Senior Data Scientist', points: '2,150 pts', avatarColor: 'bg-emerald-500' },
-  { rank: 3, name: 'Rohit Singh', role: 'DevOps Engineer', points: '1,980 pts', avatarColor: 'bg-cyan-500' },
-  { rank: 4, name: 'Neha Gupta', role: 'Senior Developer', points: '1,620 pts', avatarColor: 'bg-amber-500' },
-  { rank: 5, name: 'Bhargav', role: 'Software Engineer', points: '1,250 pts', avatarColor: 'bg-purple-500', isUser: true },
-];
-
-const discussions = [
-  { title: 'How to handle state management in large React apps?', author: 'Meera Nair', replies: 12, time: '2h ago' },
-  { title: 'Best practices for secure REST APIs', author: 'Vikram Mehta', replies: 8, time: '4h ago' },
-  { title: 'Career growth path for data scientists', author: 'Priya Sharma', replies: 15, time: '6h ago' },
-  { title: 'Tips for improving UI/UX of dashboards', author: 'Ananya Iyer', replies: 6, time: '1d ago' }
-];
-
 const KnowledgeSharing = () => {
   const [connectedMap, setConnectedMap] = useState({});
   const [requestedMap, setRequestedMap] = useState({});
@@ -111,13 +61,16 @@ const KnowledgeSharing = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [shareTitle, setShareTitle] = useState('');
   const [shareCategory, setShareCategory] = useState('React / Frontend');
-  const [sessionsList, setSessionsList] = useState(sessions);
-  const [resourcesList, setResourcesList] = useState(resources);
+  const [sessionsList, setSessionsList] = useState([]);
+  const [resourcesList, setResourcesList] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [selectedSkill, setSelectedSkill] = useState('All Skills');
   const [selectedDept, setSelectedDept] = useState('All Departments');
-  const [expertsList, setExpertsList] = useState(experts);
-  const [mentorsList, setMentorsList] = useState(mentors);
+  const [expertsList, setExpertsList] = useState([]);
+  const [mentorsList, setMentorsList] = useState([]);
+  const [communitiesList, setCommunitiesList] = useState([]);
+  const [contributorsList, setContributorsList] = useState([]);
+  const [discussionsList, setDiscussionsList] = useState([]);
 
   const handleConnect = async (expert) => {
     const name = expert.name || expert;
@@ -203,6 +156,33 @@ const KnowledgeSharing = () => {
         }
         if (articlesRes && articlesRes.data && articlesRes.data.length > 0) {
           setResourcesList(articlesRes.data.map(mapBackendArticle));
+          
+          // Dynamically derive discussions from the articles
+          const mappedDiscussions = articlesRes.data.map((art, i) => ({
+            title: `How to master ${art.title}?`,
+            author: art.author || 'Anonymous',
+            replies: 5 + (i * 3) % 15,
+            time: `${i + 1}d ago`
+          }));
+          setDiscussionsList(mappedDiscussions);
+
+          // Dynamically derive communities from article categories
+          const categories = [...new Set(articlesRes.data.map(art => art.category || 'General'))];
+          const icons = [
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" /></svg>,
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zm13.5-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v10.125c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V9.75z" /></svg>,
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z" /></svg>,
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" /></svg>
+          ];
+          const colors = ['text-blue-500', 'text-indigo-500', 'text-cyan-500', 'text-pink-500'];
+          const mappedCommunities = categories.map((cat, i) => ({
+            title: `${cat} Forum`,
+            desc: `Discuss ${cat.toLowerCase()} concepts, tutorials, and patterns.`,
+            members: `${120 + (i * 143) % 800} members`,
+            icon: icons[i % icons.length],
+            iconColor: colors[i % colors.length]
+          }));
+          setCommunitiesList(mappedCommunities);
         }
         if (profilesRes && profilesRes.data && profilesRes.data.length > 0) {
           const mappedExperts = profilesRes.data.map((p, i) => {
@@ -241,6 +221,21 @@ const KnowledgeSharing = () => {
           if (mappedMentors.length > 0) {
             setMentorsList(mappedMentors);
           }
+
+          // Dynamically derive top contributors from employee profiles
+          const mappedContributors = profilesRes.data.map((p, i) => {
+            const colors = ['bg-indigo-500', 'bg-emerald-500', 'bg-cyan-500', 'bg-purple-500', 'bg-rose-500', 'bg-amber-500'];
+            const name = p.user ? `${p.user.firstName} ${p.user.lastName}` : 'Anonymous Expert';
+            return {
+              rank: i + 1,
+              name,
+              role: p.designation || 'Software Engineer',
+              points: `${2500 - i * 250} pts`,
+              avatarColor: colors[i % colors.length],
+              isUser: p.user && p.user.email === localStorage.getItem('userEmail')
+            };
+          });
+          setContributorsList(mappedContributors);
         }
       } catch (err) {
         console.warn('Failed to load sharing data from backend:', err);
@@ -589,7 +584,7 @@ const KnowledgeSharing = () => {
             <div>
               <SectionTitle title="Communities & Forums" action={true} />
               <Card className="flex flex-col p-2 space-y-1">
-                {communities.map((comm, idx) => (
+                {communitiesList.map((comm, idx) => (
                   <div key={idx} className="flex items-center gap-4 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors cursor-pointer group">
                     <div className={`w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700 ${comm.iconColor}`}>
                       {comm.icon}
@@ -694,7 +689,7 @@ const KnowledgeSharing = () => {
           <Card>
             <SectionTitle title="Top Contributors" action={true} actionText="View Leaderboard" />
             <div className="space-y-1">
-              {contributors.map((user, i) => (
+              {contributorsList.map((user, i) => (
                 <div key={i} className={`flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors ${user.isUser ? 'bg-indigo-50/50 dark:bg-indigo-500/5 border border-indigo-100 dark:border-indigo-500/20' : ''}`}>
                   <div className="w-6 flex justify-center font-bold text-sm shrink-0">
                     {user.rank === 1 ? <span className="text-yellow-500">🥇</span> : 
@@ -722,7 +717,7 @@ const KnowledgeSharing = () => {
           <Card>
             <SectionTitle title="Recent Discussions" action={true} actionText="View All Discussions" />
             <div className="space-y-5">
-              {discussions.map((disc, i) => (
+              {discussionsList.map((disc, i) => (
                 <div key={i} className="flex items-start gap-3 cursor-pointer group">
                   <div className="mt-0.5 w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-500/20 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" /></svg>
