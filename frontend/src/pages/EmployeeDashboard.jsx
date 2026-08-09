@@ -14,7 +14,7 @@ import {
   Pie, 
   Cell 
 } from 'recharts';
-import { dashboardService, skillService, gapAnalysisService } from '../services/api';
+import { dashboardService, skillService, gapAnalysisService, profileService, courseService } from '../services/api';
 
 const Card = ({ children, className = '' }) => (
   <div className={`bg-white dark:bg-[#15171e] shadow-sm rounded-2xl border border-slate-200 dark:border-white/5 p-6 transition-all duration-300 hover:shadow-md ${className}`}>
@@ -45,30 +45,13 @@ const EmployeeDashboard = () => {
   const [selectedDept, setSelectedDept] = useState('All');
   
   // Simulated state for System Admin
-  const [usersList, setUsersList] = useState([
-    { id: 1, name: 'Alice Smith', email: 'alice@company.com', role: 'EMPLOYEE', status: 'ACTIVE' },
-    { id: 2, name: 'Bob Jones', email: 'bob@company.com', role: 'MANAGER', status: 'ACTIVE' },
-    { id: 3, name: 'Carol Danvers', email: 'carol@company.com', role: 'HR', status: 'ACTIVE' },
-    { id: 4, name: 'David Miller', email: 'david@company.com', role: 'DEPT_HEAD', status: 'ACTIVE' },
-    { id: 5, name: 'Eve Carter', email: 'eve@company.com', role: 'LD_ADMIN', status: 'ACTIVE' },
-    { id: 6, name: 'Frank Castle', email: 'frank@company.com', role: 'SYSTEM_ADMIN', status: 'ACTIVE' },
-  ]);
+  const [usersList, setUsersList] = useState([]);
 
   // Simulated state for L&D Admin
-  const [courses, setCourses] = useState([
-    { id: 1, name: 'Advanced Spring Boot Microservices', category: 'Backend Development', duration: '12h', enrollments: 34 },
-    { id: 2, name: 'React & Next.js Production Scale', category: 'Frontend Development', duration: '8h', enrollments: 45 },
-    { id: 3, name: 'Kubernetes Container Orchestration', category: 'DevOps & Cloud', duration: '16h', enrollments: 28 },
-    { id: 4, name: 'AI & Large Language Model Integrations', category: 'Artificial Intelligence', duration: '10h', enrollments: 52 },
-  ]);
+  const [courses, setCourses] = useState([]);
 
   // Simulated state for Manager Evaluation
-  const [teamMembers, setTeamMembers] = useState([
-    { id: 101, name: 'John Doe', role: 'Software Engineer', dept: 'Engineering', pendingEval: true, lastEval: '2026-03-12' },
-    { id: 102, name: 'Sarah Connor', role: 'Frontend Engineer', dept: 'Engineering', pendingEval: false, lastEval: '2026-06-20' },
-    { id: 103, name: 'Marcus Wright', role: 'QA Lead', dept: 'Engineering', pendingEval: true, lastEval: '2026-01-15' },
-    { id: 104, name: 'Kyle Reese', role: 'DevOps Engineer', dept: 'Engineering', pendingEval: false, lastEval: '2026-05-18' },
-  ]);
+  const [teamMembers, setTeamMembers] = useState([]);
 
   useEffect(() => {
     const storedName = localStorage.getItem('userName');
@@ -77,6 +60,53 @@ const EmployeeDashboard = () => {
     if (storedName) setUserName(storedName);
     if (storedId) setUserId(storedId);
     setUserRole(storedRole);
+
+    const fetchDashboardData = async () => {
+      try {
+        const [usersRes, profilesRes, coursesRes] = await Promise.all([
+          profileService.getAllUsers().catch(() => ({ data: [] })),
+          profileService.getAllProfiles().catch(() => ({ data: [] })),
+          courseService.getTrainingCourses().catch(() => ({ data: [] }))
+        ]);
+
+        if (usersRes && usersRes.data && usersRes.data.length > 0) {
+          const mappedUsers = usersRes.data.map(u => ({
+            id: u.userId,
+            name: `${u.firstName} ${u.lastName}`,
+            email: u.email,
+            role: u.role ? u.role.roleName : 'EMPLOYEE',
+            status: u.status ? u.status.toUpperCase() : 'ACTIVE'
+          }));
+          setUsersList(mappedUsers);
+        }
+
+        if (profilesRes && profilesRes.data && profilesRes.data.length > 0) {
+          const mappedTeam = profilesRes.data.map((p, idx) => ({
+            id: p.profileId,
+            name: p.user ? `${p.user.firstName} ${p.user.lastName}` : 'Anonymous Member',
+            role: p.designation || 'Software Engineer',
+            dept: p.user && p.user.department ? p.user.department.departmentName : 'Engineering',
+            pendingEval: idx % 2 === 0,
+            lastEval: `2026-0${3 + (idx % 4)}-12`
+          }));
+          setTeamMembers(mappedTeam);
+        }
+
+        if (coursesRes && coursesRes.data && coursesRes.data.length > 0) {
+          const mappedCourses = coursesRes.data.slice(0, 8).map((c, idx) => ({
+            id: c.courseId || idx + 1,
+            name: c.courseName,
+            category: c.skillName || 'General',
+            duration: c.duration || '10h',
+            enrollments: 12 + (idx * 5) % 40
+          }));
+          setCourses(mappedCourses);
+        }
+      } catch (err) {
+        console.warn('Failed to load dashboard data:', err);
+      }
+    };
+    fetchDashboardData();
   }, []);
 
   const getNormalizedRole = () => {

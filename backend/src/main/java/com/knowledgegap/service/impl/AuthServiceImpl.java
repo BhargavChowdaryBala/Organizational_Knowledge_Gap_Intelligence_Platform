@@ -3,6 +3,8 @@ package com.knowledgegap.service.impl;
 import com.knowledgegap.dto.AuthResponse;
 import com.knowledgegap.dto.LoginRequest;
 import com.knowledgegap.dto.RegisterRequest;
+import com.knowledgegap.dto.OtpLoginRequest;
+import com.knowledgegap.dto.ResetPasswordRequest;
 import com.knowledgegap.entity.Department;
 import com.knowledgegap.entity.Role;
 import com.knowledgegap.entity.User;
@@ -117,6 +119,41 @@ public class AuthServiceImpl implements AuthService {
         return new AuthResponse(
                 token,
                 "Login Successful",
+                user.getFirstName(),
+                user.getEmail(),
+                user.getUserId()
+        );
+    }
+
+    @Override
+    public AuthResponse otpLogin(OtpLoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String token = jwtUtil.generateToken(user.getEmail());
+
+        return new AuthResponse(
+                token,
+                "OTP Login Successful",
+                user.getFirstName(),
+                user.getEmail(),
+                user.getUserId()
+        );
+    }
+
+    @Override
+    public AuthResponse resetPassword(ResetPasswordRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        String token = jwtUtil.generateToken(user.getEmail());
+
+        return new AuthResponse(
+                token,
+                "Password Reset Successful",
                 user.getFirstName(),
                 user.getEmail(),
                 user.getUserId()
