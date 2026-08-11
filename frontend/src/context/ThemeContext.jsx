@@ -11,9 +11,9 @@ export const ThemeProvider = ({ children }) => {
         return savedTheme;
       }
       // Default to dark mode for this app if no preference
-      return 'dark';
+      return 'light';
     }
-    return 'dark';
+    return 'light';
   });
 
   useEffect(() => {

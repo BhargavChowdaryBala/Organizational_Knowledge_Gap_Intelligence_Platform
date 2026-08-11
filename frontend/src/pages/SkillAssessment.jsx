@@ -157,7 +157,7 @@ const SkillAssessment = () => {
       <div className="flex justify-between items-end mb-8">
         <div>
 <div className="text-sm text-slate-500 mb-2">
-            Dashboard > <span className="font-semibold text-slate-800 dark:text-white">Skill Assessment</span>
+            Dashboard &gt; <span className="font-semibold text-slate-800 dark:text-white">Skill Assessment</span>
           </div>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-1">Skill Assessment</h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm">Assess your skills, track your progress and identify areas of improvement.</p>

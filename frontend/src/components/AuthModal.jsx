@@ -463,7 +463,7 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
       ></div>
 
       {/* Modal Container */}
-      <div className="relative w-full max-w-[500px] bg-white dark:bg-[#18181b] border border-slate-200 dark:border-[#27272a] rounded-2xl shadow-2xl p-8 overflow-hidden transform transition-all animate-fade-in-up flex flex-col backdrop-blur-xl">
+      <div className="relative w-full max-w-[500px] bg-white dark:bg-[#18181b] border border-slate-200 dark:border-[#27272a] rounded-2xl shadow-2xl p-6 sm:p-8 overflow-hidden transform transition-all animate-fade-in-up flex flex-col backdrop-blur-xl">
 
         {/* Glows */}
         <div className="absolute -top-32 -left-32 w-64 h-64 bg-[#d9f95d]/10 rounded-full blur-[100px] pointer-events-none"></div>
@@ -524,24 +524,11 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
           {/* Form views */}
           {(view === 'signin' || view === 'signup') && (
             <>
-              {/* Social Login */}
-              <div className="flex gap-3 justify-center mb-6">
-                <button className="w-full flex items-center justify-center gap-2 py-2.5 bg-slate-50 hover:bg-slate-100 dark:bg-[#27272a] dark:hover:bg-[#3f3f46] rounded-xl text-sm font-medium text-slate-700 dark:text-white transition-colors border border-slate-200 dark:border-transparent hover:border-slate-300 dark:hover:border-zinc-600 cursor-pointer">
-                  <svg className="w-4 h-4" viewBox="0 0 24 24"><path fill="currentColor" d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972-3.332 0-6.033-2.701-6.033-6.032s2.701-6.032 6.033-6.032c1.498 0 2.866.549 3.921 1.453l2.814-2.814C17.503 2.988 15.139 2 12.545 2 7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.761h-9.426z" /></svg>
-                  Google
-                </button>
-              </div>
 
-              {/* Divider */}
-              <div className="flex items-center gap-4 mb-6">
-                <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800"></div>
-                <span className="bg-white dark:bg-[#18181b] px-4 text-xs font-semibold uppercase text-slate-400 dark:text-zinc-500 tracking-wider">Or</span>
-                <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800"></div>
-              </div>
 
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 {view === 'signup' && (
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">First Name</label>
                       <input
@@ -570,7 +557,7 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
                 )}
 
                 {view === 'signup' && (
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">Username</label>
                       <input
@@ -598,7 +585,7 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
                 )}
 
                 {view === 'signup' && (
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="relative">
                       <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">Role</label>
                       <button
@@ -834,18 +821,21 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
             </form>
           )}
 
+
           {/* Footer Text */}
-          <div className="mt-8 text-center border-t border-zinc-100 dark:border-[#27272a] pt-4">
-            <p className="text-sm text-slate-600 dark:text-zinc-400">
-              {view === 'signup' ? "Already have an account? " : "Don't have an account? "}
-              <button
-                onClick={() => setView(view === 'signup' ? 'signin' : 'signup')}
-                className="text-cyan-600 dark:text-[#d9f95d] hover:underline font-semibold ml-1 cursor-pointer"
-              >
-                {view === 'signup' ? 'Login' : 'Sign up'}
-              </button>
-            </p>
-          </div>
+          {(view === 'signin' || view === 'signup') && (
+            <div className="mt-8 text-center border-t border-zinc-100 dark:border-[#27272a] pt-4">
+              <p className="text-sm text-slate-600 dark:text-zinc-400">
+                {view === 'signup' ? "Already have an account? " : "Don't have an account? "}
+                <button
+                  onClick={() => setView(view === 'signup' ? 'signin' : 'signup')}
+                  className="text-cyan-600 dark:text-[#d9f95d] hover:underline font-semibold ml-1 cursor-pointer"
+                >
+                  {view === 'signup' ? 'Login' : 'Sign up'}
+                </button>
+              </p>
+            </div>
+          )}
 
         </div>
       </div>
