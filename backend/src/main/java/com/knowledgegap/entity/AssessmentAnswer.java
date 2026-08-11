@@ -19,7 +19,7 @@ public class AssessmentAnswer {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "assessment_id", nullable = false)
+    @JoinColumn(name = "assessment_id", nullable = true)
     private Assessment assessment;
 
     @Column(nullable = false)
