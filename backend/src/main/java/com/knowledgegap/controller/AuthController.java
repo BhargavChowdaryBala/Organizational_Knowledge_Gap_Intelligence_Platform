@@ -5,6 +5,7 @@ import com.knowledgegap.dto.LoginRequest;
 import com.knowledgegap.dto.RegisterRequest;
 import com.knowledgegap.dto.OtpLoginRequest;
 import com.knowledgegap.dto.ResetPasswordRequest;
+import com.knowledgegap.dto.GoogleLoginRequest;
 import com.knowledgegap.service.AuthService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,5 +38,10 @@ public class AuthController {
     @PostMapping("/reset-password")
     public AuthResponse resetPassword(@RequestBody ResetPasswordRequest request) {
         return authService.resetPassword(request);
+    }
+
+    @PostMapping("/google")
+    public AuthResponse googleLogin(@RequestBody GoogleLoginRequest request) {
+        return authService.googleLogin(request);
     }
 }

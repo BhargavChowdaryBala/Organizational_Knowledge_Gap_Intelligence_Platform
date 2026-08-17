@@ -5,6 +5,7 @@ import com.knowledgegap.dto.LoginRequest;
 import com.knowledgegap.dto.RegisterRequest;
 import com.knowledgegap.dto.OtpLoginRequest;
 import com.knowledgegap.dto.ResetPasswordRequest;
+import com.knowledgegap.dto.GoogleLoginRequest;
 
 public interface AuthService {
 
@@ -15,4 +16,6 @@ public interface AuthService {
     AuthResponse otpLogin(OtpLoginRequest request);
 
     AuthResponse resetPassword(ResetPasswordRequest request);
+
+    AuthResponse googleLogin(GoogleLoginRequest request);
 }

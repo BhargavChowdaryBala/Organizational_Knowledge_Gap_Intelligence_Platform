@@ -41,6 +41,7 @@ export const authService = {
   register: (details) => api.post('/auth/register', details),
   otpLogin: (email) => api.post('/auth/otp-login', { email }),
   resetPassword: (email, newPassword) => api.post('/auth/reset-password', { email, newPassword }),
+  googleLogin: (details) => api.post('/auth/google', details),
 };
 
 export const roleService = {

@@ -5,6 +5,9 @@ import com.knowledgegap.dto.LoginRequest;
 import com.knowledgegap.dto.RegisterRequest;
 import com.knowledgegap.dto.OtpLoginRequest;
 import com.knowledgegap.dto.ResetPasswordRequest;
+import com.knowledgegap.dto.GoogleLoginRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.knowledgegap.entity.Department;
 import com.knowledgegap.entity.Role;
@@ -155,6 +158,25 @@ public class AuthServiceImpl implements AuthService {
         return new AuthResponse(
                 token,
                 "Password Reset Successful",
+                user.getFirstName(),
+                user.getEmail(),
+                user.getUserId()
+        );
+    }
+
+    @Override
+    public AuthResponse googleLogin(GoogleLoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "No account found with this Google email. Please register first."
+                ));
+
+        String token = jwtUtil.generateToken(user.getEmail());
+
+        return new AuthResponse(
+                token,
+                "Google Login Successful",
                 user.getFirstName(),
                 user.getEmail(),
                 user.getUserId()

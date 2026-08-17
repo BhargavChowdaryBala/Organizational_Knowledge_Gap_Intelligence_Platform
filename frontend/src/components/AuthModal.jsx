@@ -14,6 +14,9 @@ const EMAILJS_TEMPLATE_ID_RESET = 'template_mioiphf';
 const EMAILJS_SERVICE_ID_OTP = 'service_pf9k7qv';
 const EMAILJS_TEMPLATE_ID_OTP = 'template_mioiphf'; // We will use template_mioiphf as the template for now until you provide the OTP template ID
 
+// Google OAuth Client ID
+const GOOGLE_CLIENT_ID = '919571617943-qp85ogdotrmpbalkcgp4odchvorbs8n7.apps.googleusercontent.com'; // Insert your client ID here to enable live OAuth
+
 const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
   const [view, setView] = useState(initialView); // 'signin' | 'signup' | 'otp_login' | 'forgot_password' | 'verify_otp' | 'reset_password'
   const [showPassword, setShowPassword] = useState(false);
@@ -92,6 +95,71 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
     }
   }, [isOpen, view]);
 
+  // Handle Google Login Integration
+  const handleGoogleLogin = async (email, firstName, lastName) => {
+    setLoading(true);
+    setError('');
+    setSuccessMessage('');
+    try {
+      const response = await authService.googleLogin({ email, firstName, lastName });
+      handleSuccessAuth(response);
+    } catch (err) {
+      console.error('Google Sign In Error:', err);
+      if (err.response && err.response.status === 404) {
+        setError('No account found with this Google email. Please register first using the Sign Up form.');
+      } else {
+        setError(err.response?.data?.message || 'Google Authentication failed. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCredentialResponse = (response) => {
+    try {
+      // Decode JWT token locally to get email, first name, last name
+      const base64Url = response.credential.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      const profile = JSON.parse(jsonPayload);
+      handleGoogleLogin(profile.email, profile.given_name, profile.family_name);
+    } catch (e) {
+      console.error('Failed to parse Google credential response:', e);
+      setError('Failed to process Google login response.');
+    }
+  };
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    if (view === 'signin' && GOOGLE_CLIENT_ID && window.google) {
+      const timer = setTimeout(() => {
+        try {
+          const container = document.getElementById('google-signin-btn-container');
+          if (container) {
+            window.google.accounts.id.initialize({
+              client_id: GOOGLE_CLIENT_ID,
+              callback: handleCredentialResponse,
+            });
+
+            window.google.accounts.id.renderButton(
+              container,
+              { theme: 'outline', size: 'large', width: '100%' }
+            );
+          }
+        } catch (err) {
+          console.warn('Failed to initialize Google Sign-In SDK:', err);
+        }
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, view]);
+
   if (!isOpen) return null;
 
   const handleChange = (e) => {
@@ -143,6 +211,8 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
       setError('Unexpected response from server.');
     }
   };
+
+
 
   // Send OTP via EmailJS REST API
   const handleSendOtp = async (purpose) => {
@@ -695,6 +765,40 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
                   {loading ? 'Processing...' : (view === 'signin' ? 'Login' : 'Request OTP & Sign Up')}
                 </button>
               </form>
+
+              {view === 'signin' && (
+                <>
+                  <div className="relative my-5">
+                    <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                      <div className="w-full border-t border-slate-200 dark:border-zinc-800"></div>
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-white dark:bg-[#18181b] px-3 text-slate-500 dark:text-zinc-400 font-medium">Or continue with</span>
+                    </div>
+                  </div>
+
+                  {GOOGLE_CLIENT_ID ? (
+                    <div className="w-full flex justify-center mt-1">
+                      <div id="google-signin-btn-container" className="w-full min-h-[44px]"></div>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setView('google_accounts')}
+                      disabled={loading}
+                      className="w-full py-2.5 bg-white hover:bg-slate-50 dark:bg-[#27272a] dark:hover:bg-[#3f3f46] border border-slate-200 dark:border-transparent text-slate-700 dark:text-white font-semibold rounded-xl transition-all duration-200 shadow-sm flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50"
+                    >
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05" />
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335" />
+                      </svg>
+                      Continue with Google (Demo Mode)
+                    </button>
+                  )}
+                </>
+              )}
             </>
           )}
 
@@ -821,6 +925,77 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
             </form>
           )}
 
+
+          {/* Google Accounts Selection View */}
+          {view === 'google_accounts' && (
+            <div className="flex flex-col gap-4 py-2">
+              <div className="text-center mb-2">
+                <p className="text-xs text-slate-500 dark:text-zinc-400">
+                  Select a registered Google account to continue to Knowledge Gap Analyzer
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-2.5 max-h-60 overflow-y-auto pr-1">
+                {/* Option 1: Default User */}
+                <button
+                  type="button"
+                  onClick={() => handleGoogleLogin('bhargavbala56@gmail.com', 'Bhargav', 'Bala')}
+                  disabled={loading}
+                  className="w-full flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100 dark:bg-[#27272a] dark:hover:bg-[#3f3f46] border border-slate-200 dark:border-transparent rounded-xl text-left transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  <div className="w-8 h-8 rounded-full bg-cyan-600 dark:bg-cyan-500/20 text-white dark:text-cyan-400 flex items-center justify-center font-bold text-sm">
+                    B
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold text-slate-900 dark:text-white truncate">Bhargav Bala</p>
+                    <p className="text-[10px] text-slate-500 dark:text-zinc-400 truncate">bhargavbala56@gmail.com</p>
+                  </div>
+                  <span className="text-[10px] text-slate-400 dark:text-zinc-500">Demo User</span>
+                </button>
+
+                {/* Option 2: Custom Google account */}
+                <div className="border-t border-slate-200 dark:border-[#27272a] pt-3 mt-1">
+                  <p className="text-[10px] font-semibold text-slate-500 dark:text-zinc-400 mb-2">Or test with a custom Google email:</p>
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const fd = new FormData(e.currentTarget);
+                      const email = fd.get('customGoogleEmail');
+                      if (email) {
+                        const namePart = email.split('@')[0];
+                        handleGoogleLogin(email, namePart.charAt(0).toUpperCase() + namePart.slice(1), '');
+                      }
+                    }}
+                    className="flex gap-2"
+                  >
+                    <input
+                      type="email"
+                      name="customGoogleEmail"
+                      required
+                      placeholder="e.g. user@gmail.com"
+                      className="flex-1 px-3 py-2 bg-slate-50 dark:bg-[#27272a] border border-slate-200 dark:border-zinc-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#d9f95d]/50"
+                    />
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 dark:bg-none dark:bg-[#d9f95d] text-white dark:text-black font-bold rounded-xl text-xs cursor-pointer disabled:opacity-50"
+                    >
+                      Sign In
+                    </button>
+                  </form>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setView('signin')}
+                disabled={loading}
+                className="text-xs text-cyan-600 dark:text-[#d9f95d] hover:underline font-semibold text-center cursor-pointer mt-2"
+              >
+                Back to Password Sign In
+              </button>
+            </div>
+          )}
 
           {/* Footer Text */}
           {(view === 'signin' || view === 'signup') && (
